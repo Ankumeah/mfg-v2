@@ -1,4 +1,9 @@
 # mfg
+
+> [!WARNING]
+> This is a temprory repo that will be merged into [mfg](https://github.com/Ankumeah/mfg)
+soon after it gets approved on [hackclub contd](https://contd.hackclub.com/dashboard/)
+
 Simple program in golang to download all your favorite mangas on [mangafreak](https://ww2.mangafreak.me)
 
 > [!WARNING]

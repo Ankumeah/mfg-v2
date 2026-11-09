@@ -1,8 +1,1 @@
-*
-!*/**
-
-!main.go
-!README.md
-!helper.sh
-!.justfile
-!.gitignore
+bin/*

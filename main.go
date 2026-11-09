@@ -1,7 +1,7 @@
 package main
 
 import (
-  "bytes"
+	"bytes"
 	"errors"
 	"flag"
 	"fmt"
@@ -10,7 +10,6 @@ import (
 	"os"
 	"path"
 	"regexp"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -19,12 +18,12 @@ import (
 const baseUrl = "https://images.mangafreak.net/downloads/"
 const baseMangaUrl = "https://ww2.mangafreak.me/Manga/"
 
+var regex1 *regexp.Regexp = regexp.MustCompile(`/Read1_[^"]*`)
+var regex2 *regexp.Regexp = regexp.MustCompile(`(?m)[0-9]+[a-z]*$`)
+
 var maxDownloads uint
 var timeout time.Duration
 var mangas []string
-
-var regex1 *regexp.Regexp
-var regex2 *regexp.Regexp
 
 func init() {
 	if len(os.Args) < 1 {
@@ -55,9 +54,6 @@ func init() {
 		fmt.Fprintf(os.Stderr, "Invalid timeout: %v\n", err.Error())
 		os.Exit(1)
 	}
-
-	regex1 = regexp.MustCompile(`/Read1_[^"]*`)
-	regex2 = regexp.MustCompile(`(?m)[0-9]*$`)
 }
 
 var client = &http.Client{Timeout: timeout}
@@ -87,9 +83,9 @@ func main() {
 		var prog int
 		go func() {
 			for {
-        if prog == len(chs) {
-          return
-        }
+				if prog == len(chs) {
+					return
+				}
 				fmt.Fprintf(os.Stderr, "\r%v / %v", len(chs), prog)
 				time.Sleep(time.Second * 1)
 			}
@@ -100,19 +96,16 @@ func main() {
 		var wg sync.WaitGroup
 		sem := make(chan struct{}, maxDownloads)
 		for _, ch := range chs {
-			chInt, err := strconv.Atoi(ch)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "\nGot non numeric chapter %v: %v\n", ch, err.Error())
-				continue
-			}
-
 			url := baseUrl + manga + "_" + ch
-			savePath := fmt.Sprintf("%0*d.cbz", maxPad, chInt)
+
+			for range maxPad - len(ch) {
+				ch = "0" + ch
+			}
 
 			sem <- struct{}{}
 			wg.Go(func() {
 				if err := downloadFile(
-					url, path.Join(manga, savePath),
+					url, path.Join(manga, ch),
 				); err != nil {
 					fmt.Fprintf(os.Stderr, "\nError while downloading chapter %v: %v\n", ch, err.Error())
 				}
@@ -170,16 +163,16 @@ func downloadFile(url string, savePath string) error {
 		return errors.New("Http error: " + res.Status)
 	}
 
-  var buf bytes.Buffer
+	var buf bytes.Buffer
 	_, err = io.Copy(&buf, res.Body)
 	if err != nil {
 		return err
 	}
 
-  err = os.WriteFile(savePath, buf.Bytes(), 0o755)
-  if err != nil {
-    return err
-  }
+	err = os.WriteFile(savePath, buf.Bytes(), 0o755)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
