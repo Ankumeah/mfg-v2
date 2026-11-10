@@ -20,8 +20,8 @@ func parseArgs() {
 		fmt.Fprintln(os.Stderr, "\tPrint this text")
 	}
 
-	flag.UintVar(&maxDownloads, "j", 10, "Max parallel downloads")
-	t := flag.String("t", "10s", "Max download timeout. Eg - 1h1m1s1ms1us1ns")
+	flag.UintVar(&maxDownloads, "j", 10, "Max parallel downloads, Default 10")
+	t := flag.String("t", "10s", "Max download timeout. Default 10s. Eg - 1h1m1s1ms1us1ns")
 	flag.Parse()
 	mangas = flag.Args()
 
