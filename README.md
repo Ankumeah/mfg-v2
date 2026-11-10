@@ -6,9 +6,6 @@ soon after it gets approved on [hackclub contd](https://contd.hackclub.com/dashb
 
 Simple program in golang to download all your favorite mangas on [mangafreak](https://ww2.mangafreak.me)
 
-> [!WARNING]
-> I did not think much of windows users while makeing this so Im sorry in advance if you happen to be on windows
-
 ## Build
   ```sh
   git clone https://github.com/Ankumeah/mfg
