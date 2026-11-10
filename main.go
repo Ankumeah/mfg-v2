@@ -1,64 +1,16 @@
 package main
 
 import (
-	"bytes"
-	"errors"
-	"flag"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
-	"path"
-	"regexp"
-	"strings"
+	"path/filepath"
 	"sync"
 	"time"
 )
 
-const baseUrl = "https://images.mangafreak.net/downloads/"
-const baseMangaUrl = "https://ww2.mangafreak.me/Manga/"
-
-var regex1 *regexp.Regexp = regexp.MustCompile(`/Read1_[^"]*`)
-var regex2 *regexp.Regexp = regexp.MustCompile(`(?m)[0-9]+[a-z]*$`)
-
-var maxDownloads uint
-var timeout time.Duration
-var mangas []string
-
-func init() {
-	if len(os.Args) < 1 {
-		fmt.Fprintln(os.Stderr, "argv is of len 0. Your runnning this on a potato arent you?")
-	}
-
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: %v [OPTIONS]... [MANGAS]...\n", os.Args[0])
-		flag.PrintDefaults()
-		fmt.Fprintln(os.Stderr, "  --help -h")
-		fmt.Fprintln(os.Stderr, "\tPrint this text")
-	}
-
-	flag.UintVar(&maxDownloads, "j", 10, "Max parallel downloads")
-	t := flag.String("t", "10s", "Max download timeout. Eg - 1h1m1s1ms1us1ns")
-	flag.Parse()
-	mangas = flag.Args()
-
-	if len(mangas) < 1 {
-		flag.Usage()
-		fmt.Fprintln(os.Stderr, "Must provide atlest one manga")
-		os.Exit(1)
-	}
-
-	var err error
-	timeout, err = time.ParseDuration(*t)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Invalid timeout: %v\n", err.Error())
-		os.Exit(1)
-	}
-}
-
-var client = &http.Client{Timeout: timeout}
-
 func main() {
+  parseArgs()
+
 	for _, manga := range mangas {
 		fmt.Printf("Downloading %v\n", manga)
 
@@ -97,6 +49,7 @@ func main() {
 		sem := make(chan struct{}, maxDownloads)
 		for _, ch := range chs {
 			url := baseUrl + manga + "_" + ch
+      rawCh := ch
 
 			for range maxPad - len(ch) {
 				ch = "0" + ch
@@ -105,9 +58,12 @@ func main() {
 			sem <- struct{}{}
 			wg.Go(func() {
 				if err := downloadFile(
-					url, path.Join(manga, ch),
+					url, filepath.Join(manga, ch + ".cbz"),
 				); err != nil {
-					fmt.Fprintf(os.Stderr, "\nError while downloading chapter %v: %v\n", ch, err.Error())
+					fmt.Fprintf(os.Stderr, "\nError while downloading chapter %v (falling back to page wise download): %v\n", ch, err.Error())
+          if err := downloadCh(sem, rawCh, manga, filepath.Join(manga, ch + ".cbz")); err != nil {
+					  fmt.Fprintf(os.Stderr, "\nPage wise download failed %v: %v\n", ch, err.Error())
+          }
 				}
 				<-sem
 				prog++
@@ -117,62 +73,4 @@ func main() {
 		fmt.Fprintf(os.Stderr, "\r%v / %v", len(chs), prog)
 		fmt.Fprintln(os.Stderr)
 	}
-}
-
-func getChapters(manga string) ([]string, error) {
-	res, err := client.Get(baseMangaUrl + manga)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-	html, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	match := regex1.FindAllString(string(html), -1)
-	match = regex2.FindAllString(strings.Join(match, "\n"), -1)
-
-	seen := make(map[string]struct{})
-	var result []string
-	for _, ch := range match {
-		if _, ok := seen[ch]; ok {
-			continue
-		}
-
-		seen[ch] = struct{}{}
-		result = append(result, ch)
-	}
-
-	return result, nil
-}
-
-func downloadFile(url string, savePath string) error {
-	if _, err := os.Stat(savePath); !errors.Is(err, os.ErrNotExist) {
-		return nil
-	} else if !errors.Is(err, os.ErrNotExist) && err != nil {
-		return err
-	}
-
-	res, err := client.Get(url)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return errors.New("Http error: " + res.Status)
-	}
-
-	var buf bytes.Buffer
-	_, err = io.Copy(&buf, res.Body)
-	if err != nil {
-		return err
-	}
-
-	err = os.WriteFile(savePath, buf.Bytes(), 0o755)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

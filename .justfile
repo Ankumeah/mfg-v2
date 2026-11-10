@@ -1,8 +1,5 @@
-[linux, macos]
-build:
-  go build -ldflags="-s -w" -o ./bin/mfg main.go
+default: run
 
-[linux, macos]
 run *args:
-  just build
+  go build -ldflags="-s -w" -o ./bin/mfg .
   ./bin/mfg {{ args }}
