@@ -30,6 +30,10 @@ func downloadFile(url string, savePath string) error {
 		return err
 	}
 
+	if buf.Len() < 1 {
+		return errors.New("Empty file")
+	}
+
 	err = os.WriteFile(savePath, buf.Bytes(), 0o644)
 	if err != nil {
 		return err
