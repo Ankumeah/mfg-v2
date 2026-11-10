@@ -4,7 +4,7 @@
 > This is a temprory repo that will be merged into [mfg](https://github.com/Ankumeah/mfg)
 soon after it gets approved on [hackclub contd](https://contd.hackclub.com/dashboard/)
 
-Simple program in golang to download all your favorite mangas on [mangafreak](https://ww2.mangafreak.me)
+Simple program in golang to download all your favorite mangas on [mangafreak](https://ww3.mangafreak.me)
 
 ## Build
   ```sh
@@ -14,8 +14,8 @@ Simple program in golang to download all your favorite mangas on [mangafreak](ht
   ```
 
 ## How to use
-- Go to [mangafreak](https://ww2.mangafreak.me/)
-- Navigate to the manga you want to download (*for example - https://ww2.mangafreak.me/Manga/Chainsaw_Man*)
+- Go to [mangafreak](https://ww3.mangafreak.me/)
+- Navigate to the manga you want to download (*for example - https://ww3.mangafreak.me/Manga/Chainsaw_Man*)
 - Copy the last part of the URL (*in this example Chainsaw_Man*)
 - Run the command
   - `mfg <your-manga>` to auto discover and download all chapters (in this example `mfg Chainsaw_Man`)

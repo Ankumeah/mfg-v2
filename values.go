@@ -8,8 +8,8 @@ import (
 
 const baseUrl = "https://images.mangafreak.net/downloads/"
 const baseImagesUrl = "https://images.mangafreak.me/mangas/"
-const baseMangaUrl = "https://ww2.mangafreak.me/Manga/"
-const baseMangaPageUrl = "https://ww2.mangafreak.me/Read1_"
+const baseMangaUrl = "https://ww3.mangafreak.me/Manga/"
+const baseMangaPageUrl = "https://ww3.mangafreak.me/Read1_"
 
 var regex1 *regexp.Regexp = regexp.MustCompile(`/Read1_[^"]*`)
 var regex2 *regexp.Regexp = regexp.MustCompile(`(?m)[0-9]+[a-z]*$`)
