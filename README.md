@@ -6,6 +6,9 @@ soon after it gets approved on [hackclub contd](https://contd.hackclub.com/dashb
 
 Simple program in golang to download all your favorite mangas on [mangafreak](https://ww3.mangafreak.me)
 
+## Lastest release
+[v0.1.0](https://github.com/Ankumeah/mfg-v2/releases/tag/v0.1.0)
+
 ## Build
   ```sh
   git clone https://github.com/Ankumeah/mfg
