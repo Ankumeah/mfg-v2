@@ -20,3 +20,4 @@ var maxDownloads uint
 var timeout time.Duration
 var mangas []string
 var client *http.Client
+var quiet bool

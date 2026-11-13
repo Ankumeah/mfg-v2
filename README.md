@@ -27,11 +27,12 @@ Simple program in golang to download all your favorite mangas on [mangafreak](ht
 
 ## Flags
 
-|    Flag    |  Type  | Default |                    Discription                    |
-|------------|--------|---------|---------------------------------------------------|
-| -j         |  uint  |   10    | Max parallel downloads                            |
-| -t         | string |   10s   | Max timeout. Eg - 1h1m1s1ms1us1ns (default "10s") |
-| -h, --help |        |         | Prints the help text                              |
+|    Flag    |  Type  | Default |            Discription            |
+|------------|--------|---------|-----------------------------------|
+| -j         |  uint  |   10    | Max parallel downloads            |
+| -t         | string |   10s   | Max timeout. Eg - 1h1m1s1ms1us1ns |
+| -q         | bool   |  false  | Report only critical errors       |
+| -h, --help |        |         | Prints the help text              |
 
 
 ## helper.sh

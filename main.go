@@ -37,18 +37,23 @@ func main() {
 			maxPad = max(maxPad, chLen)
 		}
 
-		fmt.Printf("Found %v chapters\n", len(chs))
+		if !quiet {
+			fmt.Printf("Found %v chapters\n", len(chs))
+		}
 
 		var prog int
-		go func() {
-			for {
-				if prog == len(chs) {
-					return
+
+		if !quiet {
+			go func() {
+				for {
+					if prog == len(chs) {
+						return
+					}
+					fmt.Fprintf(os.Stderr, "\r%v / %v", prog, len(chs))
+					time.Sleep(time.Second * 1)
 				}
-				fmt.Fprintf(os.Stderr, "\r%v / %v", prog, len(chs))
-				time.Sleep(time.Second * 1)
-			}
-		}()
+			}()
+		}
 
 		os.MkdirAll(manga, 0o755)
 
@@ -76,7 +81,9 @@ func main() {
 				)
 				<-sem
 				if err != nil {
-					fmt.Fprintf(os.Stderr, "\nError while downloading chapter %v (falling back to page wise download): %v\n", ch, err.Error())
+					if !quiet {
+						fmt.Fprintf(os.Stderr, "\nError while downloading chapter %v (falling back to page wise download): %v\n", ch, err.Error())
+					}
 					if err := downloadCh(sem, rawCh, manga, filepath.Join(manga, ch+".cbz")); err != nil {
 						fmt.Fprintf(os.Stderr, "\nPage wise download failed %v: %v\n", ch, err.Error())
 					}
@@ -85,7 +92,9 @@ func main() {
 			})
 		}
 		wg.Wait()
-		fmt.Fprintf(os.Stderr, "\r%v / %v", len(chs), prog)
-		fmt.Fprintln(os.Stderr)
+		if !quiet {
+			fmt.Fprintf(os.Stderr, "\r%v / %v", len(chs), prog)
+			fmt.Fprintln(os.Stderr)
+		}
 	}
 }
